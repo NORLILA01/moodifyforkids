@@ -478,6 +478,38 @@ nav button.aibtn.on{background:var(--ink);border-color:var(--ink)}
 .modal .box{background:#fff;border-radius:22px;padding:26px;max-width:420px;text-align:center;font-size:20px;font-weight:800}
 .modal .box .actions{margin-top:18px}
 @media (max-width:760px){header{position:static;padding:10px 12px}nav{flex:0 0 100%;flex-wrap:nowrap;overflow-x:auto;order:3;padding-bottom:4px}nav button{flex:none;white-space:nowrap;font-size:16px;padding:8px 14px}.lang{margin-left:auto}.ulogo{margin-left:0}}
+
+/* ---- display modes ---- */
+#modeGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#FFF6EF,#F1ECFF);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:auto}
+#modeGate .mg-logo{height:86px;margin-bottom:6px}
+#modeGate .mg-q{font-size:30px;font-weight:900;margin:10px 0 22px;text-align:center}
+#modeGate .mg-lang{display:flex;gap:8px;margin-bottom:8px}
+#modeGate .mg-lang button{border:0;border-radius:999px;padding:8px 16px;font-weight:800;background:#fff;cursor:pointer;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+#modeGate .mg-lang button.on{background:#1D1D1F;color:#fff}
+#modeGate .mg-row{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+#modeGate .mg-card{width:330px;max-width:86vw;border:0;border-radius:30px;background:#fff;padding:30px 26px;cursor:pointer;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,.09);transition:transform .15s;font-family:inherit}
+#modeGate .mg-card:hover{transform:translateY(-4px)}
+#modeGate .mg-card .mg-ic{font-size:86px;line-height:1}
+#modeGate .mg-card b{display:block;font-size:30px;margin:14px 0 8px}
+#modeGate .mg-card span{display:block;font-size:17px;color:#555;line-height:1.45}
+#modeGate .mg-t{border-top:10px solid #FF8A5B}
+#modeGate .mg-c{border-top:10px solid #8E6CC9}
+#modeGate .mg-hint{margin-top:22px;font-size:15px;color:#777;text-align:center}
+#modePill{position:fixed;left:10px;bottom:10px;z-index:9000;border:0;border-radius:999px;padding:7px 13px;font-weight:800;font-size:12px;opacity:.82;background:#1D1D1F;color:#fff;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:inherit}
+body.cls #nav button[data-go=rec],body.cls #nav button[data-go=ai],body.cls #nav button[data-go=help],body.cls #nav button[data-go=edu],body.cls #nav button[data-go=about],body.cls #nav button[data-go=slides],body.cls #nav button[data-go=ft],body.cls #nav button[data-go=team],body.cls #nav button[data-go=refs]{display:none}
+body.cls #v-home .sec-t,body.cls #homeMore,body.cls #flow,body.cls #v-home p.sub,body.cls .tips,body.cls #taNote{display:none !important}
+body.cls #homeCards .hc span{display:none}
+body.cls #homeCards .hc .ic{font-size:64px}
+body.cls #homeCards .hc b{font-size:22px}
+body.cls section input[type=text],body.cls section textarea,body.cls .custom,body.cls #ciReset,body.cls .panel:has(#cdMake),body.cls .mintro ul{display:none !important}
+body.cls section{zoom:1.1}
+body.cls #nav button{font-size:17px;padding:10px 16px}
+.paperbox{display:none}
+body.cls .paperbox{display:block;text-align:center;margin-bottom:14px}
+.paperbox .pb-t{font-size:26px;font-weight:900;margin-bottom:10px}
+.paperbox .pb-s{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.paperbox .pb-s div{background:#fff;border-radius:20px;padding:10px 16px;font-size:40px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.paperbox .pb-s small{display:block;font-size:18px;font-weight:900;color:#8E6CC9}
 </style>
 </head>
 <body>
@@ -3338,6 +3370,46 @@ function renderAll(){ renderStatic(); renderCheckin(); renderSentence(); renderW
 document.querySelectorAll("#lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("fs-lang",lang)}catch(e){}renderAll()});
 
 try{ const l=localStorage.getItem("fs-lang"); if(["zh","ms","en","ta"].includes(l)) lang=l; }catch(e){}
+
+/* ---------- display modes: Teacher / Class ---------- */
+Object.assign(UI,{
+  modeQ:{zh:"请选择使用模式",ms:"Pilih mod paparan",en:"Choose a display mode",ta:"காட்சி முறையைத் தேர்ந்தெடுக்கவும்"},
+  modeT:{zh:"老师模式",ms:"Mod Guru",en:"Teacher Mode",ta:"ஆசிரியர் முறை"},
+  modeTd:{zh:"在老师的电脑上：完整内容、教师笔记、课堂记录与 AI 分析。",ms:"Untuk komputer guru: kandungan penuh, nota guru, Rekod Kelas dan Analisis AI.",en:"For the teacher's computer: full content, teacher notes, Class Record and AI Insights.",ta:"ஆசிரியரின் கணினிக்கு: முழு உள்ளடக்கம், ஆசிரியர் குறிப்புகள், வகுப்புப் பதிவு மற்றும் AI."},
+  modeC:{zh:"课堂模式",ms:"Mod Kelas",en:"Class Mode",ta:"வகுப்பு முறை"},
+  modeCd:{zh:"投影到大屏幕：大图片、少文字，全班一起玩。",ms:"Untuk skrin besar: gambar besar, teks minimum, seluruh kelas bermain bersama.",en:"For the big screen: big pictures, little text, the whole class plays together.",ta:"பெரிய திரைக்கு: பெரிய படங்கள், குறைந்த எழுத்து, வகுப்பு முழுவதும் சேர்ந்து விளையாடும்."},
+  modeHint:{zh:"可随时用左下角的按钮切换模式",ms:"Mod boleh ditukar pada bila-bila masa melalui butang di bawah sebelah kiri",en:"Switch modes any time with the button at the bottom left",ta:"கீழ் இடது பொத்தானைக் கொண்டு எப்போது வேண்டுமானாலும் மாற்றலாம்"},
+  toC:{zh:"📽️ 切换到课堂模式",ms:"📽️ Tukar ke Mod Kelas",en:"📽️ Switch to Class Mode",ta:"📽️ வகுப்பு முறைக்கு மாறு"},
+  toT:{zh:"🧑‍🏫 切换到老师模式",ms:"🧑‍🏫 Tukar ke Mod Guru",en:"🧑‍🏫 Switch to Teacher Mode",ta:"🧑‍🏫 ஆசிரியர் முறைக்கு மாறு"},
+  paperT:{zh:"✏️ 也可以画在纸上或练习簿里！",ms:"✏️ Boleh juga lukis di atas kertas atau dalam buku latihan!",en:"✏️ You can also draw on paper or in your exercise book!",ta:"✏️ காகிதத்திலோ பயிற்சிப் புத்தகத்திலோ வரையலாம்!"},
+});
+const CLS_HIDDEN=["rec","ai","help","edu","about","slides","ft","team","refs"];
+let uiMode=null;
+function setMode(m){ uiMode=m; document.body.classList.toggle("cls",m==="class"); const g=document.getElementById("modeGate"); if(g) g.remove();
+  if(m==="class" && CLS_HIDDEN.includes(tab)) go("home"); renderMode(); window.scrollTo({top:0}); }
+function renderGate(){ let g=document.getElementById("modeGate"); if(uiMode) { if(g) g.remove(); return; }
+  if(!g){ g=document.createElement("div"); g.id="modeGate"; document.body.appendChild(g); }
+  const lg=document.querySelector("header img"); const L=[["zh","中文"],["ms","BM"],["en","EN"],["ta","தமிழ்"]];
+  g.innerHTML=`${lg?`<img class="mg-logo" src="${lg.src}" alt="Moodify"/>`:""}
+   <div class="mg-lang">${L.map(([k,n])=>`<button data-gl="${k}" class="${lang===k?"on":""}">${n}</button>`).join("")}</div>
+   <div class="mg-q">${tu("modeQ")}</div>
+   <div class="mg-row"><button class="mg-card mg-t" data-m="teacher"><div class="mg-ic">🧑‍🏫</div><b>${tu("modeT")}</b><span>${tu("modeTd")}</span></button>
+   <button class="mg-card mg-c" data-m="class"><div class="mg-ic">📽️</div><b>${tu("modeC")}</b><span>${tu("modeCd")}</span></button></div>
+   <div class="mg-hint">${tu("modeHint")}</div>`;
+  g.querySelectorAll("[data-gl]").forEach(b=>b.onclick=()=>{ lang=b.dataset.gl; try{localStorage.setItem("fs-lang",lang)}catch(e){} renderAll(); });
+  g.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+}
+function renderMode(){
+  renderGate();
+  let p=document.getElementById("modePill"); if(!p){ p=document.createElement("button"); p.id="modePill"; document.body.appendChild(p); p.onclick=()=>setMode(uiMode==="class"?"teacher":"class"); }
+  p.style.display=uiMode?"block":"none"; p.textContent=uiMode==="class"?tu("toT"):tu("toC");
+  const mB=document.getElementById("mB");
+  if(mB){ let pb=document.getElementById("paperBox"); if(!pb){ pb=document.createElement("div"); pb.id="paperBox"; pb.className="paperbox panel"; mB.insertBefore(pb,mB.firstChild); }
+    pb.innerHTML=`<div class="pb-t">${tu("paperT")}</div><div class="pb-s"><div>🟣<small>①</small></div><div>👀<small>②</small></div><div>👄<small>③</small></div><div>🎨<small>④</small></div><div>💧<small>⑤</small></div></div>`; }
+}
+const _renderAll0=renderAll; renderAll=function(){ _renderAll0(); renderMode(); };
+const _go0=go; go=function(id){ if(uiMode==="class" && CLS_HIDDEN.includes(id)) id="home"; _go0(id); };
+
 drawWheel(); renderAll(); go(location.hash.slice(1)||"home");
 window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
 </script>
