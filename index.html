@@ -510,6 +510,34 @@ body.cls .paperbox{display:block;text-align:center;margin-bottom:14px}
 .paperbox .pb-s{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
 .paperbox .pb-s div{background:#fff;border-radius:20px;padding:10px 16px;font-size:40px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
 .paperbox .pb-s small{display:block;font-size:18px;font-weight:900;color:#8E6CC9}
+
+/* ---- icons + less text ---- */
+#nav button[data-go]::before{margin-right:4px}
+#nav button[data-go=home]::before{content:"🏠"}
+#nav button[data-go=charades]::before{content:"🎭"}
+#nav button[data-go=checkin]::before{content:"🌡️"}
+#nav button[data-go=body]::before{content:"🧍"}
+#nav button[data-go=wheel]::before{content:"🎡"}
+#nav button[data-go=sentence]::before{content:"💬"}
+#nav button[data-go=monster]::before{content:"👾"}
+#nav button[data-go=calm]::before{content:"🌸"}
+#nav button[data-go=bridge]::before{content:"🌉"}
+#chDraw::before{content:"🃏 "}
+#ciToSent::before{content:"💬 "}
+#ciHide::before{content:"🙈 "}
+#whSpin::before{content:"🎡 "}
+#seSteps .step:nth-child(1)::before{content:"😊 "}
+#seSteps .step:nth-child(2)::before{content:"🤔 "}
+#seSteps .step:nth-child(3)::before{content:"🙏 "}
+#mTabs button:nth-child(1)::before{content:"👾 "}
+#mTabs button:nth-child(2)::before{content:"🖍️ "}
+#mTabs button:nth-child(3)::before{content:"🃏 "}
+#mTabs button:nth-child(4)::before{content:"🎬 "}
+body.cls .game-head p.sub,body.cls .mintro,body.cls .dhint,body.cls #v-home .hero-sub{display:none !important}
+body.cls #nav button[data-go]{font-size:0 !important;padding:6px 12px !important}
+body.cls #nav button[data-go]::before{font-size:30px;margin:0}
+body.cls #nav button[data-go]::after{content:attr(data-n);font-size:18px;font-weight:900;margin-left:4px;vertical-align:middle}
+#soundPill{position:fixed;left:10px;bottom:46px;z-index:9000;border:0;border-radius:999px;width:36px;height:36px;font-size:18px;background:#fff;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.15);opacity:.9}
 </style>
 </head>
 <body>
@@ -3409,6 +3437,36 @@ function renderMode(){
 }
 const _renderAll0=renderAll; renderAll=function(){ _renderAll0(); renderMode(); };
 const _go0=go; go=function(id){ if(uiMode==="class" && CLS_HIDDEN.includes(id)) id="home"; _go0(id); };
+
+
+/* ---------- cute click sounds ---------- */
+let sndOn=true; try{ sndOn=localStorage.getItem("fs-snd")!=="off"; }catch(e){}
+let actx=null;
+const NOTES=[1046.5,1174.7,1318.5,1568.0,1760.0,2093.0];
+function cuteSound(kind){
+  if(!sndOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume();
+    const t0=actx.currentTime, play=(f,dt,dur,vol,type,glide)=>{ const o=actx.createOscillator(), g=actx.createGain();
+      o.type=type; o.frequency.setValueAtTime(f,t0+dt); if(glide) o.frequency.exponentialRampToValueAtTime(f*glide,t0+dt+dur*0.6);
+      g.gain.setValueAtTime(0.0001,t0+dt); g.gain.exponentialRampToValueAtTime(vol,t0+dt+0.008); g.gain.exponentialRampToValueAtTime(0.0001,t0+dt+dur);
+      o.connect(g).connect(actx.destination); o.start(t0+dt); o.stop(t0+dt+dur+0.02); };
+    const n=NOTES[Math.floor(Math.random()*NOTES.length)];
+    if(kind==="nav"){ play(523.3,0,0.12,0.18,"sine",1.5); play(784,0.05,0.12,0.10,"sine",1.3); }
+    else if(kind==="big"){ play(n/2,0,0.14,0.18,"triangle",1); play(n*0.75,0.07,0.14,0.15,"triangle",1); play(n,0.14,0.22,0.15,"triangle",1); }
+    else { play(n*0.5,0,0.09,0.22,"sine",1.9); play(n,0.03,0.14,0.08,"triangle",1); }
+  }catch(e){}
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button,.chip,.emo,.lvl,.hc,.mon,.calm,.br-sc,[data-go]"); if(!b || b.id==="soundPill") return;
+  const kind = b.closest("#nav,#mTabs,#seSteps,.mg-lang") ? "nav" : (b.classList.contains("big-btn")||b.classList.contains("mg-card")||b.id==="whSpin") ? "big" : "pop";
+  cuteSound(kind);
+},true);
+function renderSound(){ let s=document.getElementById("soundPill"); if(!s){ s=document.createElement("button"); s.id="soundPill"; document.body.appendChild(s);
+    s.onclick=()=>{ sndOn=!sndOn; try{localStorage.setItem("fs-snd",sndOn?"on":"off")}catch(e){} renderSound(); if(sndOn) cuteSound("big"); }; }
+  s.textContent=sndOn?"🔔":"🔕"; s.title=sndOn?"Sound on":"Sound off"; s.style.display=uiMode?"block":"none"; }
+function numberNav(){ document.querySelectorAll("#nav button[data-go]").forEach(b=>{ const m=b.textContent.match(/[①-⑧]/); b.dataset.n=m?m[0]:""; }); }
+const _renderMode0=renderMode; renderMode=function(){ _renderMode0(); renderSound(); numberNav(); };
 
 drawWheel(); renderAll(); go(location.hash.slice(1)||"home");
 window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
